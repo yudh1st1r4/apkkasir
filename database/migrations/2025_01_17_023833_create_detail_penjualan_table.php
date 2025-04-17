@@ -6,31 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateDetailPenjualanTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * 
-     * 
-     * 
-     * @return void
-     */
     public function up()
     {
         Schema::create('detail_penjualan', function (Blueprint $table) {
-            $table->id('detailID');
-            $table->foreignId('penjualanID')->constrained('penjualan')->cascadeOnDelete();;
-            $table->foreignId('produkID')->constrained('produk');
+            $table->id(); // Laravel otomatis membuat big integer unsigned
+            $table->foreignId('penjualanID')->constrained('penjualan')->cascadeOnDelete();
+            $table->string('namaproduk');
             $table->integer('jumlahproduk');
             $table->decimal('subtotal', 10, 2);
+            $table->decimal('uangmasuk', 10, 2)->default(0);
+            $table->foreignId('pelangganID')->constrained('pelanggan')->cascadeOnDelete();
+            $table->decimal('uangkeluar', 10, 2)->default(0);
             $table->timestamps();
         });
     }
-    
+
     public function down()
     {
-        Schema::create('detail_penjualan', function (Blueprint $table) {
-            // definisi kolom
-        });
-        
+        Schema::dropIfExists('detail_penjualan');
     }
 }

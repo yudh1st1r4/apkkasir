@@ -14,10 +14,10 @@
         </div>
 
         <div>
-            <label for="produkID">Produk</label>
-            <select name="produkID" required>
+            <label for="namaproduk">Produk</label>
+            <select name="namaproduk" required>
                 @foreach ($produks as $produk)
-                    <option value="{{ $produk->produkID }}" {{ $produk->produkID == $detail->produkID ? 'selected' : '' }}>{{ $produk->nama }}</option>
+                    <option value="{{ $produk->namaproduk }}" {{ $produk->namaproduk == $detail->namaproduk ? 'selected' : '' }}>{{ $produk->nama }}</option>
                 @endforeach
             </select>
         </div>

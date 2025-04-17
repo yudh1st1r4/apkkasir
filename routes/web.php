@@ -1,48 +1,62 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PelangganController;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PenjualanController;
-//use App\Http\Controllers\DetailPenjualanController;
-use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\PelangganController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KasirController;
-use App\Http\Controllers\DetailPenjualanController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\LaporanController;
 
-Route::get('/detailpenjualan/create/{penjualanID}', [DetailPenjualanController::class, 'create'])->name('detailpenjualan.create');
 
+// Profile
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+});
 
-    Route::resource('pelanggan', PelangganController::class);
-    Route::resource('produk', ProdukController::class);
-    Route::resource('penjualan', PenjualanController::class); 
-    Route::resource('detailpenjualan', DetailPenjualanController::class);
+// Management
+Route::resource('produk', ProdukController::class);
+Route::resource('penjualan', PenjualanController::class);
+Route::resource('pelanggan', PelangganController::class);
 
-    Route::get('/detailpenjualan/create/{penjualanID}', [DetailPenjualanController::class, 'create'])->name('detailpenjualan.create');
-//Route::post('/detailpenjualan/store/{penjualanID}', [DetailPenjualanController::class, 'store'])->name('detailpenjualan.store');
-Route::get('/detailpenjualan/edit/{id}', [DetailPenjualanController::class, 'edit'])->name('detailpenjualan.edit');
-Route::put('/detailpenjualan/update/{id}', [DetailPenjualanController::class, 'update'])->name('detailpenjualan.update');
-Route::get('/detailpenjualan', [DetailPenjualanController::class, 'index'])->name('detailpenjualan.index');
+//laporan
+Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+Route::get('/laporan/cetak-pdf', [LaporanController::class, 'cetakPdf'])->name('laporan.cetakPdf');
+Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
 
-//pembayaran
-Route::get('/pembayaran', [PembayaranController::class, 'showForm'])->name('pembayaran.form');
-Route::post('/pembayaran', [PembayaranController::class, 'store'])->name('pembayaran.store');
+// API
+Route::get('/api/penjualan', [DashboardController::class, 'getSalesData']);
 
-//kasir
-Route::resource('kasir', KasirController::class);
+// Authentication
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+
+// Home & Dashboard
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
 
-require __DIR__.'/auth.php';
+// Admin Routes
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Tambahkan route khusus admin di sini
+});
 
-use App\Http\Controllers\Auth\RegisterController;
+// Kasir Routes
+Route::middleware(['auth', 'role:kasir'])->group(function () {
+    Route::get('/kasir/dashboard', [DashboardController::class, 'kasirIndex'])->name('kasir.dashboard');
+    
+});
 
-Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('register', [RegisterController::class, 'register'])->name('register.submit');

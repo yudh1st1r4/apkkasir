@@ -1,131 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Input Validation</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/1.0.2/tailwind.min.css"
-    />
-    <link rel="stylesheet" href="/css/styles.css" />
-    <style>
-    :root {
-  --valid: hsl(140 80% 40%);
-  --invalid: hsl(10 80% 40%);
-  --input: hsl(0 0% 0%);
-}
-body {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 100;
-  background-color: hsl(0 0% 6%);
-  color: hsl(0 0% 98%);
-}
-.form-group {
-  --active: 0;
-  container-type: inline-size;
-  flex: 1;
-}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kasir App - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#2f2f35] min-h-screen flex items-center justify-center">
 
-form {
-  width: 40ch;
-}
-input {
-  --is-valid: 0;
-  --is-invalid: 0;
-  background: linear-gradient(var(--input), var(--input)) padding-box,
-    linear-gradient(var(--invalid), var(--invalid))
-      calc((1 - var(--is-invalid)) * -100cqi) 0 / 100% 100% border-box,
-    linear-gradient(var(--valid), var(--valid))
-      calc((1 - var(--is-valid)) * 100cqi) 0 / 100% 100% border-box,
-    var(--input);
-  border: 2px solid transparent;
-  font-size: 1rem;
-  background-repeat: no-repeat;
-  max-width: 100%;
-  font-family: "Geist Sans", "SF Pro", sans-serif;
-  font-weight: 40;
-  background-color: #3b4148;
-  border-radius: 10px;
-  color: #a9a9a9;
-  margin-bottom: 1em;
-  padding: 0 16px;
-  width: 100%;
-  outline: 0;
-  height: 50px;
-}
-
-label {
-  margin-bottom: 0.5rem;
-  display: inline-block;
-  padding-left: 5px;
-  opacity: calc(var(--active) + 0.45);
-  transition: opacity 0.5s;
-}
-
-.form-group:focus-within {
-  --active: 1;
-}
-
-input:invalid:not(:placeholder-shown):not(:focus-visible) {
-  --is-invalid: 1;
-}
-
-input:valid {
-  --is-valid: 1;
-}
-@media (prefers-reduced-motion: no-preference) {
-  input {
-    transition: background-position 0.5s;
-  }
-}
-.submitbtn {
-  background: #2a292c;
-  border: 0;
-  margin-top: 0.5rem;
-  width: 100%;
-  height: 45px;
-  border-radius: 10px;
-  color: white;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
-}
-.submitbtn:hover {
-  background: #404949;
-}
-h1{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-  font-weight: 400;
-  font-size: 30px;
-  color: #a9a9a9;
-}                                         
-            
-    </style>
-  </head>
-  <body>
-  <form method="POST" action="{{ route('login') }}">
-  @csrf <!-- Menambahkan CSRF token -->
-  <h1>Sign in</h1>
-  <div class="form-group">
-    <label for="email">Email</label>
-    <input type="email" id="email" spellcheck="false" required placeholder="Email" autocomplete="off" />
+  <div class="w-[90%] max-w-5xl bg-[#1f1f26] text-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
     
-    <label for="password">Password</label> <!-- Menambahkan label untuk password -->
-    <input type="password" id="password" required placeholder="Password" autocomplete="off" />
-    
-    <a href="{{ route('register') }}" style="color: #a9a9a9; text-decoration: none;">Belum punya akun? Daftar di sini</a>
-    
-    <button type="submit" class="submitbtn">Login</button>
+    <!-- Left Side: Form -->
+    <div class="w-full md:w-1/2 p-10 relative z-10">
+      <h4 class="text-sm text-gray-400 mb-2">Welcome to</h4>
+      <h1 class="text-4xl font-bold mb-2">Kasir App<span class="text-blue-500">.</span></h1>
+      <p class="text-sm text-gray-400 mb-6">Manage your sales efficiently</p>
+
+      <form method="POST" action="{{ route('login') }}" class="space-y-4">
+        @csrf
+
+        <div>
+          <label for="email" class="block text-sm text-gray-300 mb-1">Email</label>
+          <input id="email" type="email" name="email" required autofocus
+            class="w-full bg-[#2d2d36] px-4 py-3 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="you@example.com">
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm text-gray-300 mb-1">Password</label>
+          <input id="password" type="password" name="password" required
+            class="w-full bg-[#2d2d36] px-4 py-3 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter your password">
+        </div>
+
+        <div class="flex items-center mb-2">
+          <input id="remember_me" type="checkbox" name="remember"
+            class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200">
+          <label for="remember_me" class="ml-2 text-sm text-gray-400">Remember me</label>
+        </div>
+
+        <div class="flex justify-between items-center">
+          @if (Route::has('password.request'))
+          <a href="{{ route('password.request') }}" class="text-sm text-blue-400 hover:underline">Forgot password?</a>
+          @endif
+
+          <button type="submit"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg focus:ring-2 focus:ring-blue-500">
+            Log In
+          </button>
+        </div>
+
+        
+      </form>
+    </div>
+
+    <!-- Right Side: Background Image -->
+    <div class="w-full md:w-1/2 hidden md:block relative">
+      <div class="absolute inset-0 bg-cover bg-center opacity-30"
+        style="background-image: url('https://i.pinimg.com/736x/2c/85/77/2c857711709b9bcc2f8c77a9762b1061.jpg');"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-[#1f1f26] to-transparent"></div>
+    </div>
+
   </div>
-</form>
-  </body>
-</html>            
+
+</body>
+</html>

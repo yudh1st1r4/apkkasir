@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,15 +8,15 @@ class Pelanggan extends Model
 {
     use HasFactory;
 
-    // Tentukan nama tabel sesuai dengan yang ada di database
-    protected $table = 'pelanggan';  // Pastikan ini sesuai dengan nama tabel di database Anda
+    protected $table = 'pelanggan';
+    protected $primaryKey = 'id'; // Default primary key Laravel
+    public $timestamps = false;
+    
+        protected $fillable = ['nama', 'alamat', 'nomortelepon'];
 
-    protected $primaryKey = 'pelangganID';  // Jika primary key Anda berbeda, pastikan ditentukan dengan benar
-
-    protected $fillable = [
-        'nama', 
-        'alamat', 
-        'nomortelepon',
-    ];
+    public function penjualan()
+    {
+        return $this->hasMany(Penjualan::class, 'pelanggan_id', 'id'); 
+    }
 }
 

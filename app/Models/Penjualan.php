@@ -9,24 +9,28 @@ class Penjualan extends Model
 {
     use HasFactory;
 
-    protected $table = 'penjualan';  // Menentukan nama tabel
-
-    protected $primaryKey = 'penjualanID'; // jika primary key-nya bukan 'id'
-
+    protected $table = 'penjualan';
+    protected $primaryKey = 'id'; // Pastikan ini sesuai
 
     protected $fillable = [
         'tanggalpenjualan',
-        'totalharga',
-        'pelangganID',
+        'pelanggan_id',
+        'produk_id',
+        'jumlahproduk',
+        'subtotal',
+        'uangmasuk',
+        'uangkeluar',
     ];
 
-    // Relasi dengan model Pelanggan
     public function pelanggan()
     {
-        return $this->belongsTo(Pelanggan::class, 'pelangganID', 'pelangganID');
+        return $this->belongsTo(Pelanggan::class, 'pelanggan_id', 'id'); // Sesuaikan ke primary key 'id'
     }
-    
 
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class, 'produk_id');
+    }
 }
 
 

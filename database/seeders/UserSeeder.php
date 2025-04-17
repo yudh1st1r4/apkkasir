@@ -1,17 +1,19 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
-class UserSeeder extends Seeder
-{
-    public function run()
-    {
-        // Membuat user dengan data yang sudah ditentukan
-        User::create([
-            'name' => 'user',
-            'email' => 'user@example.com',
-            'password' => bcrypt('password123'), // Pastikan untuk mengenkripsi password
-        ]);
-    }
-}
+User::create([
+    'name' => 'Admin',
+    'email' => 'admin@example.com',
+    'password' => Hash::make('password'),
+    'role' => 'admin'
+]);
+
+User::create([
+    'name' => 'Kasir',
+    'email' => 'kasir@example.com',
+    'password' => Hash::make('password'),
+    'role' => 'kasir'
+]);
+

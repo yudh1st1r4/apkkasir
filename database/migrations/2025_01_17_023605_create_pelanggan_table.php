@@ -8,19 +8,17 @@ class CreatePelangganTable extends Migration
 {
     public function up()
     {
-        Schema::create('pelanggan', function (Blueprint $table) {
-            $table->id('pelangganID');  // Menentukan kolom primary key
-            $table->string('nama');
-            $table->text('alamat');
-            $table->string('nomortelepon');
+        Schema::create('pelanggans', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama');              // Masih pakai string, cocok untuk teks
+            $table->text('alamat');              // Ganti jadi text, lebih cocok untuk alamat panjang
+            $table->integer('nomortelepon');     // Ganti dari string ke integer
             $table->timestamps();
         });
     }
-    
+
     public function down()
     {
-        Schema::dropIfExists('pelanggan');
+        Schema::dropIfExists('pelanggans');
     }
-    
-
 }

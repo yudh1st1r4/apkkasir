@@ -1,110 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Detail Penjualan</title>
+    <title>Form Detail Penjualan</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-            padding: 20px;
+            background-color: #121212;
+            color: #ffffff;
         }
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            background-color: #222;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        .form-control, .btn {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #333;
         }
-        h1 {
-            text-align: center;
-            color: #fff;
+        .form-control:focus {
+            background-color: #252525;
+            color: #ffffff;
         }
-        label {
-            font-weight: bold;
-            display: block;
-            margin: 10px 0 5px;
+        .btn-primary {
+            background-color: #ffcc00;
+            border-color: #ffcc00;
+            color: #000;
         }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            background-color: #333;
-            color: #fff;
-        }
-        button {
-            background-color: #444;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #555;
+        .btn-primary:hover {
+            background-color: #e6b800;
+            border-color: #e6b800;
         }
     </style>
 </head>
 <body>
+    <div class="container mt-5">
+        <h2 class="text-center">Form Detail Penjualan</h2>
+        <form action="{{ route('detailpenjualan.store') }}" method="POST">
+            @csrf
+            
+            @if ($errors->any())
+                <div class="mb-4 bg-danger text-white border border-danger p-3 rounded">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="penjualanID" class="form-label">Penjualan ID</label>
+                    <select name="penjualanID" id="penjualanID" class="form-control" required>
+                        @foreach($penjualans as $penjualan)
+                            <option value="{{ $penjualan->penjualanID }}">{{ $penjualan->penjualanID }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="produkID" class="form-label">Nama Produk</label>
+                    <select name="produkID" id="produkID" class="form-control" required>
+                        @foreach($produks as $produk)
+                            <option value="{{ $produk->produkID }}" data-harga="{{ $produk->harga }}">{{ $produk->namaproduk }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="jumlahproduk" class="form-label">Jumlah Produk</label>
+                    <input type="number" name="jumlahproduk" id="jumlahproduk" class="form-control" min="1" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="subtotal" class="form-label">Subtotal</label>
+                    <input type="text" name="subtotal" id="subtotal" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="uangmasuk" class="form-label">Uang Masuk</label>
+                    <input type="number" name="uangmasuk" id="uangmasuk" class="form-control" min="0" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="uangkembalian" class="form-label">Uang Kembalian</label>
+                    <input type="text" name="uangkembalian" id="uangkembalian" class="form-control" readonly>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100">Simpan</button>
+        </form>
+    </div>
 
-<div class="container">
-    <h1>Tambah Detail Penjualan</h1>
+    <script>
+        document.getElementById('produkID').addEventListener('change', updateSubtotal);
+        document.getElementById('jumlahproduk').addEventListener('input', updateSubtotal);
+        document.getElementById('uangmasuk').addEventListener('input', hitungKembalian);
 
-    <form action="{{ route('detailpenjualan.store') }}" method="POST">
-    @csrf
+        function updateSubtotal() {
+            var harga = document.querySelector('#produkID option:checked').getAttribute('data-harga');
+            var jumlah = document.getElementById('jumlahproduk').value;
+            var subtotalField = document.getElementById('subtotal');
 
-    <label for="penjualanID">Penjualan</label>
-    <select name="penjualanID" required>
-        <option value="" disabled selected>Pilih Penjualan</option>
-        @foreach ($penjualan as $p)
-            <option value="{{ $p->penjualanID }}">{{ $p->penjualanID }}</option>
-        @endforeach
-    </select>
-    @error('penjualanID')
-        <div style="color: red;">{{ $message }}</div>
-    @enderror
+            if (harga && jumlah) {
+                var subtotal = harga * jumlah;
+                subtotalField.value = 'Rp ' + subtotal.toLocaleString('id-ID');
+                hitungKembalian();
+            } else {
+                subtotalField.value = '';
+            }
+        }
 
-    <label for="produkID">Produk</label>
-    <select name="produkID" required>
-        <option value="" disabled selected>Pilih Produk</option>
-        @foreach ($produks as $produk)
-            <option value="{{ $produk->produkID }}">{{ $produk->namaproduk }}</option>
-        @endforeach
-    </select>
-    @error('produkID')
-        <div style="color: red;">{{ $message }}</div>
-    @enderror
+        function hitungKembalian() {
+            var subtotal = parseFloat(document.getElementById('subtotal').value.replace('Rp ', '').replace(',', '')) || 0;
+            var uangMasuk = parseFloat(document.getElementById('uangmasuk').value) || 0;
+            var uangkembalianField = document.getElementById('uangkembalian');
 
-    <label for="jumlahproduk">Jumlah Produk</label>
-    <input type="number" name="jumlahproduk" required>
-    @error('jumlahproduk')
-        <div style="color: red;">{{ $message }}</div>
-    @enderror
-
-    <label for="subtotal">Subtotal</label>
-    <input type="text" name="subtotal" required>
-    @error('subtotal')
-        <div style="color: red;">{{ $message }}</div>
-    @enderror
-
-    <button type="submit">Simpan</button>
-</form>
-
-@if(session('success'))
-    <div style="color: green;">{{ session('success') }}</div>
-@endif
-@if(session('error'))
-    <div style="color: red;">{{ session('error') }}</div>
-@endif
-
-</div>
-
+            if (uangMasuk >= subtotal) {
+                var kembalian = uangMasuk - subtotal;
+                uangkembalianField.value = 'Rp ' + kembalian.toLocaleString('id-ID');
+            } else {
+                uangkembalianField.value = 'Rp 0';
+            }
+        }
+    </script>
 </body>
 </html>

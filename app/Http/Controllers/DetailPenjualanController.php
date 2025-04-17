@@ -1,88 +1,115 @@
-<?php  
+<?php
 
 namespace App\Http\Controllers;
 
-use App\Models\DetailPenjualan;
-use App\Models\Penjualan;
-use App\Models\Produk;
-use App\Models\Pelanggan;  //Tambahkan baris ini untuk mengimport model Pelanggan
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Penjualan;
+use App\Models\DetailPenjualan;
+use App\Models\Pelanggan;
+use App\Models\Produk;
 
-class DetailPenjualanController extends Controller
+class PenjualanController extends Controller
 {
     public function index()
     {
-        $detailPenjualan = DetailPenjualan::with(['penjualan', 'produk'])->get();
-        
-        return view('detailpenjualan.index', compact('detailPenjualan'));
+        $penjualans = Penjualan::with('detailPenjualan.produk', 'pelanggan')->get();
+        return view('penjualan.index', compact('penjualans'));
     }
 
-    // Di controller untuk menampilkan form create
     public function create()
-{
-    $penjualan = Penjualan::all(); 
-    $produks = Produk::all();
-    return view('detailpenjualan.create', compact('penjualan', 'produks'));
-}
+    {
+        $pelanggans = Pelanggan::all();
+        $produks = Produk::all();
+        return view('penjualan.create', compact('pelanggans', 'produks'));
+    }
 
-public function store(Request $request)
-{
-    $request->validate([
-        'penjualanID' => 'required|exists:penjualan,penjualanID',
-        'produkID' => 'required|exists:produk,produkID',
-        'jumlahproduk' => 'required|integer|min:1',
-        'subtotal' => 'required|numeric'
-    ]);
-
-    try {
-        DetailPenjualan::create([
-            'penjualanID' => $request->penjualanID,
-            'produkID' => $request->produkID,
-            'jumlahproduk' => $request->jumlahproduk,
-            'subtotal' => $request->subtotal
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'pelangganID'   => 'required|exists:pelanggans,id',
+            'produkID'      => 'required|array',
+            'produkID.*'    => 'exists:produks,id',
+            'jumlahproduk'  => 'required|array',
+            'jumlahproduk.*'=> 'integer|min:1',
+            'subtotal'      => 'required|array',
+            'subtotal.*'    => 'numeric|min:0',
+            'uangmasuk'     => 'nullable|numeric|min:0',
+            'uangkembalian' => 'nullable|numeric|min:0'
         ]);
 
-        return redirect()->route('detailpenjualan.index')->with('success', 'Data berhasil disimpan!');
-    } catch (\Exception $e) {
-        return redirect()->route('detailpenjualan.create')->with('error', 'Error: ' . $e->getMessage());
-    }
-}
+        DB::transaction(function () use ($validatedData) {
+            $penjualan = Penjualan::create([
+                'pelangganID'   => $validatedData['pelangganID'],
+                'uangmasuk'     => $validatedData['uangmasuk'] ?? 0,
+                'uangkembalian' => $validatedData['uangkembalian'] ?? 0,
+            ]);
 
+            foreach ($validatedData['produkID'] as $index => $produkID) {
+                DetailPenjualan::create([
+                    'penjualanID'  => $penjualan->id,
+                    'produkID'     => $produkID,
+                    'jumlahproduk' => $validatedData['jumlahproduk'][$index],
+                    'subtotal'     => $validatedData['subtotal'][$index],
+                ]);
+            }
+        });
 
-    public function show($id)
-    {
-        $detail = DetailPenjualan::findOrFail($id);
-        return view('detailpenjualan.show', compact('detail'));
+        return redirect()->route('penjualan.index')->with('success', 'Data penjualan berhasil ditambahkan.');
     }
 
     public function edit($id)
     {
-        $detail = DetailPenjualan::findOrFail($id);
-        $penjualan = Penjualan::all();
+        $penjualan = Penjualan::with('detailPenjualan')->findOrFail($id);
+        $pelanggans = Pelanggan::all();
         $produks = Produk::all();
-        return view('detailpenjualan.edit', compact('detail', 'penjualan', 'produks'));
+        return view('penjualan.edit', compact('penjualan', 'pelanggans', 'produks'));
     }
 
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'penjualanID' => 'required|exists:penjualan,penjualanID',
-            'produkID' => 'required|exists:produk,produkID',
-            'jumlahproduk' => 'required|integer|min:1',
-            'subtotal' => 'required|numeric|min:0',
+        $validatedData = $request->validate([
+            'pelangganID'   => 'required|exists:pelanggans,id',
+            'produkID'      => 'required|array',
+            'produkID.*'    => 'exists:produks,id',
+            'jumlahproduk'  => 'required|array',
+            'jumlahproduk.*'=> 'integer|min:1',
+            'subtotal'      => 'required|array',
+            'subtotal.*'    => 'numeric|min:0',
+            'uangmasuk'     => 'nullable|numeric|min:0',
+            'uangkembalian' => 'nullable|numeric|min:0'
         ]);
 
-        $detail = DetailPenjualan::findOrFail($id);
-        $detail->update($validated);
+        DB::transaction(function () use ($validatedData, $id) {
+            $penjualan = Penjualan::findOrFail($id);
+            $penjualan->update([
+                'pelangganID'   => $validatedData['pelangganID'],
+                'uangmasuk'     => $validatedData['uangmasuk'] ?? 0,
+                'uangkembalian' => $validatedData['uangkembalian'] ?? 0,
+            ]);
 
-        return redirect()->route('detailpenjualan.index')->with('success', 'Detail Penjualan berhasil diperbarui');
+            $penjualan->detailPenjualan()->delete();
+            foreach ($validatedData['produkID'] as $index => $produkID) {
+                DetailPenjualan::create([
+                    'penjualanID'  => $penjualan->id,
+                    'produkID'     => $produkID,
+                    'jumlahproduk' => $validatedData['jumlahproduk'][$index],
+                    'subtotal'     => $validatedData['subtotal'][$index],
+                ]);
+            }
+        });
+
+        return redirect()->route('penjualan.index')->with('success', 'Data penjualan berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
-        $detail = DetailPenjualan::findOrFail($id);
-        $detail->delete();
+        $penjualan = Penjualan::findOrFail($id);
+        DB::transaction(function () use ($penjualan) {
+            $penjualan->detailPenjualan()->delete();
+            $penjualan->delete();
+        });
 
-        return redirect()->route('detailpenjualan.index')->with('success', 'Detail Penjualan berhasil dihapus');
+        return redirect()->route('penjualan.index')->with('success', 'Data penjualan berhasil dihapus.');
     }
 }

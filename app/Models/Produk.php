@@ -8,20 +8,18 @@ class Produk extends Model
 {
     use HasFactory;
 
-    // Specify the table name (if it's different from the default 'produks')
-    protected $table = 'produk';  // Use 'produk' if your table name is singular.
+    protected $table = 'produk';  
+    protected $primaryKey = 'id'; // Sesuai dengan database
 
-    // Specify the primary key name
-    protected $primaryKey = 'produkID';  // Your primary key column
-    protected $fillable = [
-        'namaproduk',
-        'harga',
-        'deskripsi',
-        'gambar',
-    ];
-    // If the primary key is not auto-incrementing (e.g., UUID), set this property to false
-    public $incrementing = true;  // Set to 'false' if your key is not auto-incrementing
+    public $incrementing = true;
+    protected $keyType = 'int';
 
-    // If the primary key is not an integer, specify the key type (e.g., 'string' for UUIDs)
-    protected $keyType = 'int';  // Set to 'string' if your primary key is not an integer
+    protected $fillable = ['namaproduk', 'harga', 'stock', 'gambar']; // Tambahkan ini
+
+    // Mengubah relasi menjadi belongsToMany untuk menangani many-to-many
+    public function penjualan()
+    {
+        return $this->belongsToMany(Penjualan::class, 'penjualan_produk', 'produk_id', 'penjualan_id')
+                    ->withPivot('jumlahproduk'); // Menambahkan kolom jumlah produk di tabel pivot
+    }
 }

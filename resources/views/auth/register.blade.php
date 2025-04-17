@@ -1,134 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Register</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/1.0.2/tailwind.min.css"
-    />
-    <link rel="stylesheet" href="/css/styles.css" />
-    <style>
-        /* CSS Anda tetap di sini */
-        :root {
-  --valid: hsl(140 80% 40%);
-  --invalid: hsl(10 80% 40%);
-  --input: hsl(0 0% 0%);
-}
-body {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 100;
-  background-color: hsl(0 0% 6%);
-  color: hsl(0 0% 98%);
-}
-.form-group {
-  --active: 0;
-  container-type: inline-size;
-  flex: 1;
-}
-
-form {
-  width: 40ch;
-}
-input {
-  --is-valid: 0;
-  --is-invalid: 0;
-  background: linear-gradient(var(--input), var(--input)) padding-box,
-    linear-gradient(var(--invalid), var(--invalid))
-      calc((1 - var(--is-invalid)) * -100cqi) 0 / 100% 100% border-box,
-    linear-gradient(var(--valid), var(--valid))
-      calc((1 - var(--is-valid)) * 100cqi) 0 / 100% 100% border-box,
-    var(--input);
-  border: 2px solid transparent;
-  font-size: 1rem;
-  background-repeat: no-repeat;
-  max-width: 100%;
-  font-family: "Geist Sans", "SF Pro", sans-serif;
-  font-weight: 40;
-  background-color: #3b4148;
-  border-radius: 10px;
-  color: #a9a9a9;
-  margin-bottom: 1em;
-  padding: 0 16px;
-  width: 100%;
-  outline: 0;
-  height: 50px;
-}
-
-label {
-  margin-bottom: 0.5rem;
-  display: inline-block;
-  padding-left: 5px;
-  opacity: calc(var(--active) + 0.45);
-  transition: opacity 0.5s;
-}
-
-.form-group:focus-within {
-  --active: 1;
-}
-
-input:invalid:not(:placeholder-shown):not(:focus-visible) {
-  --is-invalid: 1;
-}
-
-input:valid {
-  --is-valid: 1;
-}
-@media (prefers-reduced-motion: no-preference) {
-  input {
-    transition: background-position 0.5s;
-  }
-}
-.submitbtn {
-  background: #2a292c;
-  border: 0;
-  margin-top: 0.5rem;
-  width: 100%;
-  height: 45px;
-  border-radius: 10px;
-  color: white;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
-}
-.submitbtn:hover {
-  background: #404949;
-}
-h1{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-  font-weight: 400;
-  font-size: 30px;
-  color: #a9a9a9;
-}       
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <form method="POST" action="{{ route('register.submit') }}">
-        @csrf <!-- Tambahkan CSRF token -->
-        <h1>Register</h1>
-        <div class="form-group">
-            <label for="name">Nama</label>
-            <input type="text" id="name" name="name" spellcheck="false" required placeholder="Nama" autocomplete="off" />
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" spellcheck="false" required placeholder="Email" autocomplete="off" />
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required placeholder="Password" autocomplete="off" />
-            <label for="password_confirmation">Konfirmasi Password</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="Konfirmasi Password" autocomplete="off" />
-            <button type="submit" class="submitbtn">Daftar</button>
-        </div>
-        <div style="text-align: center; margin-top: 1rem;">
-            <a href="{{ route('login') }}" style="color: #a9a9a9; text-decoration: none;">Sudah punya akun? Login di sini</a>
-        </div>
+<body class="bg-[#2f2f35] min-h-screen flex items-center justify-center relative overflow-hidden">
+
+  <!-- Background Image -->
+  <div class="absolute inset-0 bg-cover bg-center opacity-20 blur-sm"
+       style="background-image: url('https://i.pinimg.com/736x/2c/85/77/2c857711709b9bcc2f8c77a9762b1061.jpg');"></div>
+
+  <!-- Gradient Overlay -->
+  <div class="absolute inset-0 bg-gradient-to-r from-[#1f1f26] via-[#2f2f35] to-[#1f1f26] opacity-90"></div>
+
+  <!-- Form -->
+  <div class="relative z-10 w-[90%] max-w-md bg-[#1f1f26]/80 text-white p-8 rounded-2xl shadow-xl backdrop-blur-md">
+
+    <h1 class="text-3xl font-bold mb-2 text-center">Register<span class="text-blue-500">.</span></h1>
+    <p class="text-sm text-gray-400 mb-6 text-center">Silakan isi data untuk membuat akun baru</p>
+
+    <form method="POST" action="{{ route('register') }}" class="space-y-5">
+      @csrf
+
+      <!-- Name -->
+      <div>
+        <label for="name" class="block text-sm mb-1">Name</label>
+        <input id="name" name="name" type="text" required value="{{ old('name') }}"
+               class="w-full px-4 py-3 rounded-lg bg-[#2d2d36] text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="Masukkan nama lengkap">
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label for="email" class="block text-sm mb-1">Email</label>
+        <input id="email" name="email" type="email" required value="{{ old('email') }}"
+               class="w-full px-4 py-3 rounded-lg bg-[#2d2d36] text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="Masukkan email">
+      </div>
+
+      <!-- Role -->
+      <div>
+        <label for="role" class="block text-sm mb-1">Role</label>
+        <select id="role" name="role" required
+                class="w-full px-4 py-3 rounded-lg bg-[#2d2d36] text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="kasir" selected>Kasir</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label for="password" class="block text-sm mb-1">Password</label>
+        <input id="password" name="password" type="password" required
+               class="w-full px-4 py-3 rounded-lg bg-[#2d2d36] text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="Buat password">
+      </div>
+
+      <!-- Confirm Password -->
+      <div>
+        <label for="password_confirmation" class="block text-sm mb-1">Confirm Password</label>
+        <input id="password_confirmation" name="password_confirmation" type="password" required
+               class="w-full px-4 py-3 rounded-lg bg-[#2d2d36] text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="Ulangi password">
+      </div>
+
+      <div class="flex justify-between items-center text-sm">
+        <a href="{{ route('login') }}" class="text-blue-500 hover:underline">Sudah punya akun?</a>
+        <button type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          Register
+        </button>
+      </div>
     </form>
+  </div>
+
 </body>
 </html>

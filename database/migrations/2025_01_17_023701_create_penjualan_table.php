@@ -14,20 +14,30 @@ class CreatePenjualanTable extends Migration
     public function up()
     {
         Schema::create('penjualan', function (Blueprint $table) {
-            $table->id('penjualanID');  // Kolom primary key penjualan
-            $table->date('tanggalpenjualan');  // Tanggal penjualan
-            $table->decimal('totalharga', 10, 2);  // Total harga penjualan
-            $table->unsignedBigInteger('pelangganID');  // Relasi dengan pelanggan
+            $table->id();
+            $table->date('tanggalpenjualan');
+            $table->unsignedBigInteger('pelanggan_id');
+            $table->unsignedBigInteger('produk_id');
+            $table->integer('jumlahproduk');
+            $table->decimal('subtotal', 10, 2);
+            $table->decimal('uangmasuk', 10, 2)->default(0.00);
+            $table->decimal('uangkeluar', 10, 2)->default(0.00);
+            //$table->string('metode_pembayaran')->after('uangkeluar');
             $table->timestamps();
-    
-            // Membuat relasi dengan tabel pelanggan
-            $table->foreign('pelangganID')->references('pelangganID')->on('pelanggan')->onDelete('cascade');
+
+            // Foreign keys
+            $table->foreign('pelanggan_id')->references('id')->on('pelanggan')->onDelete('cascade');
+            $table->foreign('produk_id')->references('id')->on('produk')->onDelete('cascade');
         });
     }
-    
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
     public function down()
     {
         Schema::dropIfExists('penjualan');
     }
-    
 }
